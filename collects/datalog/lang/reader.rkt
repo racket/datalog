@@ -11,8 +11,7 @@
              [(color-lexer)
               (dynamic-require 'datalog/tool/syntax-color 'get-syntax-token)]
              [(configure-runtime)
-              (λ ()
-                (current-read-interaction even-read))]
+              (λ () (current-read-interaction even-read))]
              [else (default key defval)]))
   (require datalog/parse
            datalog/private/compiler)
