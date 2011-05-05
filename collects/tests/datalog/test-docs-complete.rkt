@@ -1,3 +1,3 @@
 #lang racket/base
 (require rackunit/docs-complete)
-(check-docs (quote mzcom/installer))
+(check-docs (quote datalog))
