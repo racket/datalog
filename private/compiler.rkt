@@ -5,27 +5,35 @@
          datalog/stx)
 (require (for-template datalog/stx))
 
-(provide/contract
- [compile-program (program/c . -> . (listof syntax?))]
- [compile-statement (statement/c . -> . syntax?)])
+(provide
+ current-datalog-introducer
+ (contract-out
+  [compile-program (program/c . -> . (listof syntax?))]
+  [compile-statement (statement/c . -> . syntax?)]))
 
 (define (compile-program p)
   (map compile-statement p))
+
+(define current-datalog-introducer
+  (make-parameter (λ (x) x)))
+
+(define (intro x)
+  ((current-datalog-introducer) x))
 
 (define compile-statement
   (match-lambda
     [(assertion srcloc c)
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (! #,(compile-clause c)))]
+       (#,(intro #'!) #,(compile-clause c)))]
     [(retraction srcloc c)
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (~ #,(compile-clause c)))]
+       (#,(intro #'~) #,(compile-clause c)))]
     [(query srcloc l)
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (? #,(compile-literal l)))]))
+       (#,(intro #'?) #,(compile-literal l)))]))
 
 (define compile-clause
   (match-lambda
@@ -35,14 +43,14 @@
     [(clause srcloc head body)
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (:- #,@(map compile-literal (list* head body))))]))
+       (#,(intro #':-) #,@(map compile-literal (list* head body))))]))
 
 (define compile-literal
   (match-lambda
     [(literal srcloc '= (and ts (app length 2)))
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (= #,@(map compile-term ts)))]
+       (#,(intro #'=) #,@(map compile-term ts)))]
     [(literal srcloc pred ts)
      (define srcstx (datum->syntax #f 'x srcloc))
      (define pred-stx (if (predicate-sym? pred)
