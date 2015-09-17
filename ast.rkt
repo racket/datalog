@@ -7,8 +7,8 @@
         (list/c any/c
                 (or/c exact-positive-integer? #f)
                 (or/c exact-nonnegative-integer? #f)
-                (or/c exact-nonnegative-integer? #f)
-                (or/c exact-positive-integer? #f))))
+                (or/c exact-positive-integer? #f)
+                (or/c exact-nonnegative-integer? #f))))
 
 (define-struct predicate-sym (srcloc sym) #:prefab)
 (define datum/c (or/c string? symbol? predicate-sym?))
