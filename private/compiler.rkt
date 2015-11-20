@@ -72,4 +72,4 @@
   (port-count-lines! p)
   (match-define (list source-name line column position span) srcloc)
   (set-port-next-location! p line column position)
-  (read-syntax source-name p))
+  (syntax-property (read-syntax source-name p) 'original-for-check-syntax #t))
