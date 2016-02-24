@@ -14,7 +14,9 @@
    [(? string? s)
     (text (format "~S" s))]
    [(? number? s)
-    (text (format "~S" s))]))
+    (text (format "~S" s))]
+   [x
+    (text (format "~v" x))]))
 (define (format-variable v)
   (format-datum (variable-sym v)))
 (define (format-constant c)
