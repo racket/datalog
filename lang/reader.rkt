@@ -18,14 +18,16 @@
              [else (default key defval)]))
   (require datalog/parse
            datalog/private/compiler)
-
+  
   (define (call-with-intro thunk)
     (define intro (make-syntax-introducer #t))
     (parameterize ([current-datalog-introducer intro])
       (intro (thunk))))
   
   (define (this-read-syntax [src #f] [in (current-input-port)])
-    (quasisyntax/loc src
-      #,(compile-program
-         (parameterize ([current-source-name src])
-           (parse-program in))))))
+    ((make-syntax-delta-introducer #'here #f)
+     (quasisyntax/loc src
+       #,(compile-program
+          (parameterize ([current-source-name src])
+            (parse-program in))))
+     'remove)))
