@@ -46,9 +46,30 @@
                         (loop #f string-char delimiter-stack #f))
                  (loop #f string-char delimiter-stack #f))]
             [else
-             (loop (and blank? (char-whitespace? c))
-                   string-char
-                   delimiter-stack
-                   closed?)])))))
+             (if (char-whitespace? c)
+                 (loop blank? string-char delimiter-stack closed?)
+                 (loop #f string-char delimiter-stack #f))])))))
 
 (provide repl-submit?)
+
+(module+ test
+  (require rackunit)
+  (define (try str) (repl-submit? (open-input-string str) #t))
+  (check-equal? (try "") #f)
+  (check-equal? (try "  \n") #f)
+  (check-equal? (try "  \n.") #t)
+  (check-equal? (try "  \n.   ") #t)
+  (check-equal? (try "a") #f)
+  (check-equal? (try "a(") #f)
+  (check-equal? (try "a(b)") #f)
+  (check-equal? (try "a(b).") #t)
+  (check-equal? (try "a(b)\n.") #t)
+  (check-equal? (try "a(\"b\").") #t)
+  (check-equal? (try "a(\"\\b\").") #t)
+  (check-equal? (try "a(\"\\\"b\").") #t)
+  (check-equal? (try "a(\"\\\"b).") #f)
+  (check-equal? (try "a(\"(\").") #t)
+  (check-equal? (try "a(x).a") #f)
+  (check-equal? (try "a(x).a(") #f)
+  (check-equal? (try "a(x)))))).") #t)
+  (check-equal? (try ")))))).") #t))
