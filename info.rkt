@@ -8,7 +8,8 @@
 (define deps '("base"
                "parser-tools-lib"))
 (define build-deps '("racket-doc"
-                     "scribble-lib"))
+                     "scribble-lib"
+                     "rackunit-lib"))
 
 (define pkg-desc "An implementation of the Datalog language")
 
