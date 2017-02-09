@@ -9,6 +9,11 @@
          datalog/ast
          datalog/eval)
 
+(begin-for-syntax
+  (define (datalog-variable-string? s)
+    (and (< 0 (string-length s))
+         (char-upper-case? (string-ref s 0)))))
+
 (define-syntax (:- stx)
   (raise-syntax-error ':- "only allowed inside ! and ~" stx))
 (define-syntax (! stx)
@@ -108,7 +113,7 @@
                 (cond
                   [(identifier-binding #'sym 0)
                    empty]
-                  [(char-upper-case? (string-ref (symbol->string (syntax->datum #'sym)) 0))
+                  [(datalog-variable-string? (symbol->string (syntax->datum #'sym)))
                    (list #'sym)]
                   [else
                    empty])]
@@ -209,7 +214,7 @@
       [(identifier-binding #'sym 0)
        (quasisyntax/loc #'sym
          (constant #,(srcloc-list #'sym) sym))]
-      [(char-upper-case? (string-ref (symbol->string (syntax->datum #'sym)) 0))
+      [(datalog-variable-string? (symbol->string (syntax->datum #'sym)))
        (quasisyntax/loc #'sym
          (variable #,(srcloc-list #'sym) 'sym))]
       [else
