@@ -9,8 +9,8 @@
   (define pv (dlexer (open-input-string str)))
   (define v (position-token-token pv))
   (test-equal? (format "lexer: ~a: <~a,~a>" str tok-name tok-value)
-               (cons tok-name tok-value)
-               (cons (token-name v) (token-value v))))
+               (cons (token-name v) (token-value v))
+               (cons tok-name tok-value)))
 
 (define lex-tests
   (test-suite
