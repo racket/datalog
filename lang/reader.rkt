@@ -26,7 +26,7 @@
   
   (define (this-read-syntax [src #f] [in (current-input-port)])
     ((make-syntax-delta-introducer #'here #f)
-     (quasisyntax/loc src
+     (quasisyntax
        #,(compile-program
           (parameterize ([current-source-name src])
             (parse-program in))))
