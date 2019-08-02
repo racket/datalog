@@ -77,8 +77,9 @@
 (define-struct assertion (srcloc clause) #:prefab)
 (define-struct retraction (srcloc clause) #:prefab)
 (define-struct query (srcloc question) #:prefab)
+(define-struct requirement (srcloc lib) #:prefab)
 
-(define statement/c (or/c assertion? retraction? query?))
+(define statement/c (or/c assertion? retraction? query? requirement?))
 (define program/c (listof statement/c))
 
 (provide/contract
@@ -95,7 +96,7 @@
  [term/c contract?]
  [term-equal? (term/c term/c . -> . boolean?)]
  [struct literal ([srcloc srcloc/c]
-                  [predicate (or/c predicate-sym? string? symbol?)]
+                  [predicate (or/c predicate-sym? string? symbol? number? boolean?)]
                   [terms (listof term/c)])]
  [literal-equal? (literal? literal? . -> . boolean?)]
  [struct external ([srcloc srcloc/c]
@@ -116,5 +117,7 @@
                      [clause clause?])]
  [struct query ([srcloc srcloc/c]
                 [question question/c])]
+ [struct requirement ([srcloc srcloc/c]
+                      [lib string?])]
  [statement/c contract?]
  [program/c contract?])

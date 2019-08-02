@@ -33,7 +33,11 @@
     [(query srcloc l)
      (define srcstx (datum->syntax #f 'x srcloc))
      (quasisyntax/loc srcstx
-       (#,(intro #'?) #,(compile-literal l)))]))
+       (#,(intro #'?) #,(compile-literal l)))]
+    [(requirement srcloc l)
+     (define srcstx (datum->syntax #f 'x srcloc))
+     (quasisyntax/loc srcstx
+       (#,(intro #'require) #,(datum->syntax #f (string->symbol l))))]))
 
 (define compile-clause
   (match-lambda
@@ -58,7 +62,14 @@
                                                 (predicate-sym-srcloc pred))
                           pred))
      (quasisyntax/loc srcstx
-       (#,pred-stx #,@(map compile-term ts)))]))
+       (#,pred-stx #,@(map compile-term ts)))]
+    [(external srcloc predicate-sym predicate arg-terms ans-terms)
+     (define srcstx (datum->syntax #f 'x srcloc))
+     (quasisyntax/loc srcstx
+       (#,(datum->syntax #f predicate-sym)
+        #,@(map compile-term arg-terms)
+        #,(intro #':-)
+        #,@(map compile-term ans-terms)))]))
 
 (define compile-term
   (match-lambda

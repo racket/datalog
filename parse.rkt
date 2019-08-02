@@ -37,9 +37,12 @@
                  [(statement statements) (list* $1 $2)])
      (statement [(assertion) $1]
                 [(query) $1]
-                [(retraction) $1])
+                [(retraction) $1]
+                [(requirement) $1])
      (assertion [(clause DOT) (make-assertion (make-srcloc $1-start-pos $2-end-pos) $1)])
      (retraction [(clause TILDE) (make-retraction (make-srcloc $1-start-pos $2-end-pos) $1)])
+     (requirement [(LPAREN IDENTIFIER RPAREN DOT)
+                   (make-requirement (make-srcloc $1-start-pos $4-end-pos) $2)])
      (query [(literal QMARK) (make-query (make-srcloc $1-start-pos $2-end-pos) $1)])
      (clause [(literal TSTILE body) (make-clause (make-srcloc $1-start-pos $3-end-pos) $1 $3)]
              [(literal) (make-clause (make-srcloc $1-start-pos $1-end-pos) $1 empty)])
@@ -49,17 +52,32 @@
               [(predicate-sym LPAREN terms RPAREN) (make-literal (make-srcloc $1-start-pos $4-end-pos) $1 $3)]
               [(predicate-sym) (make-literal (make-srcloc $1-start-pos $1-end-pos) $1 empty)]
               [(term NEQUAL term) (make-literal (make-srcloc $1-start-pos $3-end-pos) '!= (list $1 $3))]
-              [(term EQUAL term) (make-literal (make-srcloc $1-start-pos $3-end-pos) '= (list $1 $3))])
+              [(term EQUAL term) (make-literal (make-srcloc $1-start-pos $3-end-pos) '= (list $1 $3))]
+              [(variable TSTILE IDENTIFIER LPAREN terms RPAREN)
+               (make-external (make-srcloc $1-start-pos $6-end-pos) (string->symbol $3) replace-me $5 (list $1))])
      (predicate-sym [(IDENTIFIER) (make-predicate-sym (make-srcloc $1-start-pos $1-end-pos) (string->symbol $1))]
                     [(STRING) $1])
      (terms [(term) (list $1)]
             [(term COMMA terms) (list* $1 $3)])
-     (term [(VARIABLE) (make-variable (make-srcloc $1-start-pos $1-end-pos) (string->symbol $1))]
+     (term [(variable) $1]
            [(constant) (make-constant (make-srcloc $1-start-pos $1-end-pos) $1)])
-     (constant [(IDENTIFIER) (string->symbol $1)]
+     (variable [(VARIABLE) (make-variable (make-srcloc $1-start-pos $1-end-pos) (string->symbol $1))])
+     (constant [(IDENTIFIER) (string->constant $1)]
                [(STRING) $1]))
-    
+
     (suppress))))
+
+(define (string->constant s)
+  (cond
+    [(string=? s "false") #f]
+    [(string=? s "true") #t]
+    [(regexp-match? #rx"^(?:0|-?[1-9][0-9]*)$" s) (string->number s)]
+    [else (string->symbol s)]))
+
+(define (replace-me . args)
+  (error 'datalog
+         "expected predicate procedure to be replaced by compilation; arguments are ~v"
+         args))
 
 (define ((mk-parser which) ip)
   (define (go)

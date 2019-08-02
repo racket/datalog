@@ -20,15 +20,19 @@
     (test-literal-parse "parent(john, douglas)"
                         (make-literal #f 'parent (list (make-constant #f 'john) (make-constant #f 'douglas))))
     (test-literal-parse "1 = 2"
-                        (make-literal #f '= (list (make-constant #f '|1|) (make-constant #f '|2|))))
-    (test-literal-parse "1 != 2"
-                        (make-literal #f '!= (list (make-constant #f '|1|) (make-constant #f '|2|))))
+                        (make-literal #f '= (list (make-constant #f 1) (make-constant #f 2))))
+    (test-literal-parse "1 != -2"
+                        (make-literal #f '!= (list (make-constant #f 1) (make-constant #f -2))))
+    (test-literal-parse "01 != 2"
+                        (make-literal #f '!= (list (make-constant #f '|01|) (make-constant #f 2))))
+    (test-literal-parse "true != false"
+                        (make-literal #f '!= (list (make-constant #f #t) (make-constant #f #f))))
     (test-literal-parse "zero-arity-literal"
                         (make-literal #f 'zero-arity-literal empty))
     (test-literal-parse "zero-arity-literal()"
                         (make-literal #f 'zero-arity-literal empty))
     (test-literal-parse "\"=\"(3,3)"
-                        (make-literal #f "=" (list (make-constant #f '|3|) (make-constant #f '|3|))))
+                        (make-literal #f "=" (list (make-constant #f 3) (make-constant #f 3))))
     (test-literal-parse "\"\"(-0-0-0,&&&,***,\"\00\")"
                         (make-literal #f "" (list (make-constant #f '-0-0-0)
                                                   (make-constant #f '&&&)

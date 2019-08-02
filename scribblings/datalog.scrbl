@@ -41,15 +41,19 @@ A string is a sequence of characters enclosed in double quotes. Characters other
 included in a string. The remaining characters may be specified using escape characters, @litchar["\\\""], @litchar["\\\n"], and
 @litchar["\\\\"] respectively.
 
-A literal, is a predicate symbol followed by an optional parenthesized list of comma separated terms. A predicate symbol is either an identifier
-or a string. A term is either a variable or a constant. As with predicate symbols, a constant is either an identifier or a string. As a special case,
-two terms separated by @litchar["="] (@litchar["!="]) is a literal for the equality (inequality) predicate.
+A literal is a predicate symbol followed by an optional parenthesized list of comma separated terms, or it is an @tech{external query} as
+described below. A predicate symbol is either an identifier
+or a string. A term is either a variable or a constant. A constant is an identifier, string, integer, or boolean, where booleans are written
+the same as the identifiers @litchar{true} and @litchar{false}, and integers are written the same as identifiers @litchar{0} or those with a nonempty
+sequence of digits, no leading zero, and optionally prefixed with @litchar{-}. As a special case, two terms separated by @litchar["="] (@litchar["!="]) is a
+literal for the equality (inequality) predicate.
 The following are literals:
 @verbatim[#:indent 4 #<<END
 parent(john, douglas)
 zero-arity-literal
 "="(3,3)
 ""(-0-0-0,&&&,***,"\00")
+42
 END
 ]
 
@@ -67,9 +71,13 @@ ancestor(A, B) :-
 END
 ]
 
-A program is a sequence of zero or more statements. A statement is an assertion, a retraction, or a query. An assertion is a clause followed by
-a period, and it adds the clause to the database if it is safe. A retraction is a clause followed by a tilde, and it removes the clause from
-the database. A query is a literal followed by a question mark. 
+A program is a sequence of zero or more statements. A statement is an assertion, a retraction, a query, or a requirement. An assertion is a clause followed by
+a @litchar{.}, and it adds the clause to the database if it is safe. A retraction is a clause followed by @litchar{~}, and it removes the clause from
+the database. A query is a literal followed by a @litchar{?}. A requirement is a @litchar{(}, then an identifier, then @litchar{)}, then
+@litchar{.}, and it imports functions that can be called as external queries.
+
+A @deftech{external query} is a variable, then @litchar{:-}, then an identifier, then a parenthesized list of comma separated terms.
+Beware than an external query can break Datalog's termination guarantee.
 
 The following BNF describes the syntax of Datalog.
 
@@ -79,13 +87,16 @@ The following BNF describes the syntax of Datalog.
  (list (nonterm "statement")
        (nonterm "assertion")
        (nonterm "retraction")
-       (nonterm "query"))
+       (nonterm "query")
+       (nonterm "requirement"))
  (list (nonterm "assertion")
        (BNF-seq (nonterm "clause") (litchar ".")))
  (list (nonterm "retraction")
        (BNF-seq (nonterm "clause") (litchar "~")))
  (list (nonterm "query")
        (BNF-seq (nonterm "literal") (litchar "?")))
+ (list (nonterm "requirement")
+       (BNF-seq (litchar "(") (nonterm "IDENTIFIER") (litchar ")") (litchar ".")))
  (list (nonterm "clause")
        (BNF-seq (nonterm "literal") (litchar ":-") (nonterm "body"))
        (nonterm "literal"))
@@ -97,7 +108,8 @@ The following BNF describes the syntax of Datalog.
        (BNF-seq (nonterm "predicate-sym") (litchar "(") (nonterm "terms") (litchar ")"))
        (nonterm "predicate-sym")
        (BNF-seq (nonterm "term") (litchar "=") (nonterm "term"))
-       (BNF-seq (nonterm "term") (litchar "!=") (nonterm "term")))
+       (BNF-seq (nonterm "term") (litchar "!=") (nonterm "term"))
+       (BNF-seq (nonterm "VARIABLE") (litchar ":-") (nonterm "external-sym") (litchar "(") (nonterm "terms") (litchar ")")))
  (list (nonterm "predicate-sym")
        (nonterm "IDENTIFIER")
        (nonterm "STRING"))
@@ -109,7 +121,9 @@ The following BNF describes the syntax of Datalog.
        (nonterm "constant"))
  (list (nonterm "constant")
        (nonterm "IDENTIFIER")
-       (nonterm "STRING"))
+       (nonterm "STRING")
+       (nonterm "INTEGER")
+       (BNF-alt (litchar "true") (litchar "false")))
 ]
 
 The effect of running a Datalog program is to modify the database as directed
@@ -126,6 +140,27 @@ The following is a program:
      path(X, Y)?
 END
 ]
+
+Here is a program that uses @racket[+] and @racket[-] from
+@racketmodname[racket/base] as external queries:
+
+@verbatim[#:indent 4]{
+#lang datalog
+(racket/base).
+
+fib(0, 0).
+fib(1, 1).
+
+fib(N, F) :- N != 1,
+             N != 0,
+             N1 :- -(N, 1),
+             N2 :- -(N, 2),
+             fib(N1, F1),
+             fib(N2, F2),
+             F :- +(F1, F2).
+
+fib(30, F)?
+}
 
 The Datalog REPL accepts new statements that are executed as if they were in the original program text.
 
