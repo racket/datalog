@@ -77,7 +77,7 @@ the database. A query is a literal followed by a @litchar{?}. A requirement is a
 @litchar{.}, and it imports functions that can be called as external queries.
 
 A @deftech{external query} is a variable, then @litchar{:-}, then an identifier, then a parenthesized list of comma separated terms.
-Beware than an external query can break Datalog's termination guarantee.
+Beware that an external query can break Datalog's termination guarantee.
 
 The following BNF describes the syntax of Datalog.
 
