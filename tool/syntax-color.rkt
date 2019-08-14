@@ -1,9 +1,13 @@
 #lang racket/base
-(require parser-tools/lex
+(require racket/contract/base
+         syntax-color/lexer-contract
+         parser-tools/lex
          (prefix-in : parser-tools/lex-sre)
          "../private/lex.rkt")
 
-(provide get-syntax-token)
+(provide
+ (contract-out
+  [get-syntax-token lexer/c]))
 
 (define (syn-val lex a b c d)
   (values lex a b (position-offset c) (position-offset d)))
@@ -11,12 +15,13 @@
 (define (colorize-string my-start-pos)
   (define lxr
     (lexer
-     [(:~ #\" #\\) (lxr input-port)]
+     [(eof) (syn-val "" 'error #f my-start-pos end-pos)]
+     [(:~ #\" #\\ #\newline) (lxr input-port)]
      [(:: #\\ #\\) (lxr input-port)]
      [(:: #\\ #\newline) (lxr input-port)]
      [(:: #\\ #\") (lxr input-port)]
-     [(eof) (syn-val "" 'error #f my-start-pos end-pos)]
-     [#\" (syn-val "" 'string #f my-start-pos end-pos)]))
+     [#\" (syn-val "" 'string #f my-start-pos end-pos)]
+     [any-char (syn-val "" 'error #f my-start-pos end-pos)]))
   lxr)
 
 (define get-syntax-token

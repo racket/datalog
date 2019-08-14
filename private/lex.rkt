@@ -12,7 +12,8 @@
 
 (define get-string-token
   (lexer
-   [(:~ #\" #\\) (cons (car (string->list lexeme))
+   [(eof) (error 'datalog-lexer "Unterminated string")]
+   [(:~ #\" #\\ #\newline) (cons (car (string->list lexeme))
                        (get-string-token input-port))]
    [(:: #\\ #\\) (cons #\\ (get-string-token input-port))]
    [(:: #\\ #\newline) (cons #\newline (get-string-token input-port))]
