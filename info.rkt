@@ -6,7 +6,8 @@
 
 (define compile-omit-paths '("tests"))
 (define deps '("base"
-               "parser-tools-lib"))
+               "parser-tools-lib"
+               "syntax-color-lib"))
 (define build-deps '("racket-doc"
                      "scribble-lib"
                      "rackunit-lib"))
