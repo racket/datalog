@@ -41,3 +41,11 @@
    [any-char (syn-val lexeme 'error #f start-pos end-pos)]
    [(special) (syn-val lexeme 'error #f start-pos end-pos)]
    [(special-comment) (syn-val lexeme 'error #f start-pos end-pos)]))
+
+(module+ test
+  (define p (open-input-string "\"\\}\n{}\"û@F\n`ª\"\"~\e\u009A\u0081Ä)| ||\"\"|\"}ô|ü\"û\u0081±\"@u|ΣZ}\"\u00955í;/@ýG\u0001λþ\u0082)Pbù\"\"\u0018Σþ\u008CÁ\"\"h*)W|!"))
+  (let loop ()
+    (define-values (lex sym b c d) (get-syntax-token p))
+    (unless (eq? 'eof sym)
+      (printf "~a(~v)\n" sym lex)
+      (loop))))

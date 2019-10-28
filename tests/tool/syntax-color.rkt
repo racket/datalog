@@ -33,6 +33,6 @@
    (test-color ":-" 'parenthesis)
    (test-color "\"foo\"" 'string)
    (test-color "\"fo\\\"o\"" 'string)
-   (test-color "\"fo\no\"" 'string)
+   (test-color "\"fo\no\"" 'error)
    (test-color "\"foo" 'error)
    (test-color ":" 'error)))
