@@ -15,3 +15,6 @@
 (define pkg-desc "An implementation of the Datalog language")
 
 (define pkg-authors '(jay))
+
+(define license
+  '(Apache-2.0 OR MIT))
