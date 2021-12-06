@@ -1,0 +1,28 @@
+node(b).
+node(c).
+node(d).
+node(a).
+edge(a, b).
+edge(b, b).
+edge(b, c).
+edge(c, c).
+edge(c, d).
+edge(a, a).
+edge(d, d).
+edge(d, a).
+path(b, a).
+path(b, d).
+path(b, c).
+path(b, b).
+path(c, b).
+path(c, a).
+path(c, d).
+path(c, c).
+path(a, d).
+path(a, c).
+path(a, b).
+path(a, a).
+path(d, c).
+path(d, b).
+path(d, a).
+path(d, d).

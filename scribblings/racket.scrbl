@@ -49,12 +49,12 @@ The Datalog database can be directly used by Racket programs through this API.
                           (parent A B)))
                    (! (:- (ancestor A B)
                           (parent A C)
-                          (= D C) 
+                          (= D C)
                           (ancestor D B))))
- 
+
           (datalog family
                    (? (ancestor A B)))
- 
+
           (let ([x 'joseph2])
             (datalog family
                      (? (parent x X))))
@@ -70,8 +70,8 @@ The Datalog database can be directly used by Racket programs through this API.
 
 @defproc[(make-theory) theory/c]{ Creates a theory for use with @racket[datalog]. }
 
-@defproc[(write-theory [t theory/c]) void]{ Writes a theory to the current output port. Source location information is lost. }
-@defproc[(read-theory) theory/c]{ Reads a theory from the current input port. }
+@defproc[(write-theory [t theory/c] [out output-port? (current-output-port)]) void?]{ Writes @racket[t] to @racket[out]. Source location information is lost. }
+@defproc[(read-theory [in input-port? (current-input-port)]) theory/c]{ Reads and returns a theory from @racket[in]. }
 
 @defform[(datalog thy-expr
                   stmt ...)
@@ -79,7 +79,7 @@ The Datalog database can be directly used by Racket programs through this API.
 
 @defform[(datalog! thy-expr
                   stmt ...)
-         #:contracts ([thy-expr theory/c])]{ Executes the statements on the theory given by @racket[thy-expr]. Prints the answers to every query in the list of statements. Returns @racket[(void)]. }     
+         #:contracts ([thy-expr theory/c])]{ Executes the statements on the theory given by @racket[thy-expr]. Prints the answers to every query in the list of statements. Returns @racket[(void)]. }
 
 Statements are either assertions, retractions, or queries.
 
