@@ -104,16 +104,15 @@
                       #'(e ...)]))
 
                  (λ stx*
-                   (for*/fold ([vars '()])
+                   (for*/fold ([vars '()]
+                               #:result (remove-duplicates vars bound-identifier=?))
                               ([stx0 (in-list stx*)]
                                [stx  (in-list (syntax->list (parser stx0)))])
                      (if (syntax-parse stx
                            [sym:id
                             (and
                              (not (identifier-binding #'sym 0))
-                             (datalog-variable-symbol? (syntax->datum #'sym))
-                             (not (findf (curry bound-identifier=? #'sym)
-                                         vars)))]
+                             (datalog-variable-symbol? (syntax->datum #'sym)))]
                            [sym:expr #f])
                          (cons stx vars)
                          vars)))))
