@@ -21,18 +21,12 @@
      #f]
     [x x]))
 
-(define (write-theory t)
-  (write (remove-paths t)))
+(define (write-theory t [out (current-output-port)])
+  (write (remove-paths t) out))
 
-(define (hash->hash! ht)
-  (define ht! (make-hash))
-  (for ([(k v) (in-hash ht)])
-    (hash-set! ht! k v))
-  ht!)
-
-(define (read-theory)
-  (hash->hash! (read)))
+(define (read-theory [in (current-input-port)])
+  (hash-copy (read in)))
 
 (provide/contract
- [write-theory (-> theory/c void)]
- [read-theory (-> theory/c)])
+ [write-theory (->* (theory/c) (output-port?) void?)]
+ [read-theory (->* () (input-port?) theory/c)])
