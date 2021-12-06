@@ -104,20 +104,19 @@
                       #'(e ...)]))
 
                  (λ stx*
-                   (for/fold ([vars0 '()])
-                             ([stx0 (in-list stx*)])
-                     (for/fold ([vars vars0])
-                               ([stx (in-list (syntax->list (parser stx0)))])
-                       (if (syntax-parse stx
-                             [sym:id
-                              (and
-                               (not (identifier-binding #'sym 0))
-                               (datalog-variable-symbol? (syntax->datum #'sym))
-                               (not (findf (curry bound-identifier=? #'sym)
-                                           vars)))]
-                             [sym:expr #f])
-                           (cons stx vars)
-                           vars))))))
+                   (for*/fold ([vars '()])
+                              ([stx0 (in-list stx*)]
+                               [stx  (in-list (syntax->list (parser stx0)))])
+                     (if (syntax-parse stx
+                           [sym:id
+                            (and
+                             (not (identifier-binding #'sym 0))
+                             (datalog-variable-symbol? (syntax->datum #'sym))
+                             (not (findf (curry bound-identifier=? #'sym)
+                                         vars)))]
+                           [sym:expr #f])
+                         (cons stx vars)
+                         vars)))))
              (define head-vars (datalog-literal-variables #'head))
              (define body-vars (apply datalog-literal-variables (syntax->list #'(body ...))))
              (define body-vars-in-head
